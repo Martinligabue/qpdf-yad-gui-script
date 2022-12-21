@@ -27,10 +27,20 @@ additional_options=${arg_array[7]}
 
 # Build the qpdf command
 command="qpdf"
+if [ ! -f "$input_file" ]; then
+    yad --error --text="Error: Input file not found"
+    exit 1
+fi
 
 # Add the input file argument
 if [ ! -z "$input_file" ]; then
     command="$command --input-file $input_file"
+fi
+if [ -f "$output_file" ]; then
+    confirm=$(yad --question --text="Output file already exists. Overwrite?")
+    if [ "$confirm" != "0" ]; then
+        exit 0
+    fi
 fi
 
 # Add the output file argument
@@ -70,3 +80,4 @@ fi
 
 # Execute the qpdf command
 $command
+trap 'yad --error --text="Error: qpdf command failed" >&2' ERR
